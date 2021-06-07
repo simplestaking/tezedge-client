@@ -1,14 +1,11 @@
 use serde::{Serialize, Deserialize};
 
 use crate::api::{
+    get_pending_operations_url,
     TransportError, GetPendingOperations, GetPendingOperationsResult,
     GetPendingOperationsError, PendingOperations, PendingOperation,
 };
 use crate::http_api::HttpApi;
-
-fn get_pending_operations_url(base_url: &str) -> String {
-    format!("{}/chains/main/mempool/pending_operations", base_url)
-}
 
 impl From<ureq::Error> for GetPendingOperationsError {
     fn from(error: ureq::Error) -> Self {

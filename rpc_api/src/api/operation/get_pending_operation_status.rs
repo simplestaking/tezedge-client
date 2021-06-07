@@ -1,6 +1,11 @@
 use std::fmt::{self, Display};
 
-use crate::api::{TransportError, GetPendingOperations, GetPendingOperationsError, PendingOperation};
+use crate::BoxFuture;
+use crate::api::{
+    TransportError, GetPendingOperationsError,
+    GetPendingOperations, GetPendingOperationsAsync,
+    PendingOperation, PendingOperations,
+};
 
 #[derive(thiserror::Error, Debug)]
 #[error(transparent)]
@@ -54,6 +59,13 @@ pub trait GetPendingOperationStatus {
     ) -> GetPendingOperationStatusResult;
 }
 
+pub trait GetPendingOperationStatusAsync {
+    fn get_pending_operation_status<'a>(
+        &'a self,
+        operation_hash: &'a str,
+    ) -> BoxFuture<'a, GetPendingOperationStatusResult>;
+}
+
 #[inline]
 fn build_error<E>(op_hash: &str, kind: E) -> GetPendingOperationStatusError
     where E: Into<GetPendingOperationStatusErrorKind>,
@@ -64,8 +76,31 @@ fn build_error<E>(op_hash: &str, kind: E) -> GetPendingOperationStatusError
     }
 }
 
+#[inline]
+fn get_status_from_pending_operations(
+    operation_hash: &str,
+    pending_operations: PendingOperations,
+) -> GetPendingOperationStatusResult
+{
+    let contained_by = |ops: &[PendingOperation]| {
+        ops.iter()
+            .find(|op| op.hash == operation_hash)
+            .is_some()
+    };
+
+    let status = if contained_by(&pending_operations.applied) {
+        PendingOperationStatus::Applied
+    } else if contained_by(&pending_operations.refused) {
+        PendingOperationStatus::Refused
+    } else {
+        PendingOperationStatus::Finished
+    };
+
+    Ok(status)
+}
+
 impl<T> GetPendingOperationStatus for T
-    where T: GetPendingOperations
+    where T: GetPendingOperations,
 {
     fn get_pending_operation_status(
         &self,
@@ -75,20 +110,23 @@ impl<T> GetPendingOperationStatus for T
         let pending_operations = self.get_pending_operations()
             .map_err(|err| build_error(operation_hash, err))?;
 
-        let contained_by = |ops: &[PendingOperation]| {
-            ops.iter()
-                .find(|op| op.hash == operation_hash)
-                .is_some()
-        };
+        get_status_from_pending_operations(operation_hash, pending_operations)
+    }
+}
 
-        let status = if contained_by(&pending_operations.applied) {
-            PendingOperationStatus::Applied
-        } else if contained_by(&pending_operations.refused) {
-            PendingOperationStatus::Refused
-        } else {
-            PendingOperationStatus::Finished
-        };
+impl<T> GetPendingOperationStatusAsync for T
+    where T: GetPendingOperationsAsync,
+{
+    fn get_pending_operation_status<'a>(
+        &'a self,
+        operation_hash: &'a str,
+    ) -> BoxFuture<'a, GetPendingOperationStatusResult>
+    {
+        Box::pin(async move {
+            let pending_operations = self.get_pending_operations().await
+                .map_err(|err| build_error(operation_hash, err))?;
 
-        Ok(status)
+            get_status_from_pending_operations(operation_hash, pending_operations)
+        })
     }
 }

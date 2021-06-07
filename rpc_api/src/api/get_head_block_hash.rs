@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 
 use types::{BlockHash, FromPrefixedBase58CheckError};
+use crate::BoxFuture;
 use crate::api::TransportError;
 
 #[derive(thiserror::Error, Debug)]
@@ -26,4 +27,13 @@ pub type GetHeadBlockHashResult = Result<BlockHash, GetHeadBlockHashError>;
 pub trait GetHeadBlockHash {
     /// Get head block's hash.
     fn get_head_block_hash(&self) -> GetHeadBlockHashResult;
+}
+
+pub trait GetHeadBlockHashAsync {
+    /// Get head block's hash.
+    fn get_head_block_hash<'a>(&'a self) -> BoxFuture<'a, GetHeadBlockHashResult>;
+}
+
+pub(crate) fn get_head_block_hash_url(base_url: &str) -> String {
+    format!("{}/chains/main/blocks/head/hash", base_url)
 }

@@ -2,6 +2,7 @@ use std::fmt::{self, Display};
 
 use types::OriginatedAddress;
 use crypto::ToBase58Check;
+use crate::BoxFuture;
 use crate::api::TransportError;
 
 #[derive(thiserror::Error, Debug)]
@@ -16,6 +17,17 @@ pub enum GetContractStorageErrorKind {
 pub struct GetContractStorageError {
     pub address: OriginatedAddress,
     pub kind: GetContractStorageErrorKind,
+}
+
+impl GetContractStorageError {
+    pub(crate) fn new<E>(address: &OriginatedAddress, kind: E) -> Self
+        where E: Into<GetContractStorageErrorKind>,
+    {
+        Self {
+            address: address.clone(),
+            kind: kind.into(),
+        }
+    }
 }
 
 impl Display for GetContractStorageError {
@@ -35,4 +47,20 @@ pub trait GetContractStorage {
         &self,
         addr: &OriginatedAddress,
     ) -> GetContractStorageResult;
+}
+
+pub trait GetContractStorageAsync {
+    fn get_contract_storage<'a>(
+        &'a self,
+        addr: &'a OriginatedAddress,
+    ) -> BoxFuture<'a, GetContractStorageResult>;
+}
+
+/// Get manager key
+pub(crate) fn get_contract_storage_url(base_url: &str, addr: &OriginatedAddress) -> String {
+    format!(
+        "{}/chains/main/blocks/head/context/contracts/{}/storage",
+        base_url,
+        addr.to_base58check(),
+    )
 }

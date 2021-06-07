@@ -3,6 +3,7 @@ use serde::Deserialize;
 use serde::de;
 
 use types::NewOperationGroup;
+use crate::BoxFuture;
 use crate::api::{TransportError, GetChainIDError};
 
 #[derive(thiserror::Error, Debug)]
@@ -82,4 +83,19 @@ pub trait RunOperation {
         &self,
         operation_group: &NewOperationGroup,
     ) -> RunOperationResult;
+}
+
+pub trait RunOperationAsync {
+    /// Simulate an operation.
+    ///
+    /// Useful for calculating fees as is returns estimated consumed gas,
+    /// and it doesn't require signing the operation first.
+    fn run_operation<'a>(
+        &'a self,
+        operation_group: &'a NewOperationGroup,
+    ) -> BoxFuture<'a, RunOperationResult>;
+}
+
+pub(crate) fn run_operation_url(base_url: &str) -> String {
+    format!("{}/chains/main/blocks/head/helpers/scripts/run_operation", base_url)
 }

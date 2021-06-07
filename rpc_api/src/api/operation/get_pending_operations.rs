@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 use serde::{Deserialize, Serialize};
 
+use crate::BoxFuture;
 use crate::api::TransportError;
 
 #[derive(thiserror::Error, Debug)]
@@ -35,4 +36,13 @@ pub type GetPendingOperationsResult = Result<PendingOperations, GetPendingOperat
 pub trait GetPendingOperations {
     /// Get pending operations from mempool.
     fn get_pending_operations(&self) -> GetPendingOperationsResult;
+}
+
+pub trait GetPendingOperationsAsync {
+    /// Get pending operations from mempool.
+    fn get_pending_operations<'a>(&'a self) -> BoxFuture<'a, GetPendingOperationsResult>;
+}
+
+pub(crate) fn get_pending_operations_url(base_url: &str) -> String {
+    format!("{}/chains/main/mempool/pending_operations", base_url)
 }

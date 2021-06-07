@@ -1,9 +1,9 @@
-use crate::api::{TransportError, GetVersionInfo, GetVersionInfoResult, GetVersionInfoError};
+use crate::api::{
+    get_version_info_url,
+    GetVersionInfo, GetVersionInfoResult,
+    TransportError, GetVersionInfoError,
+};
 use crate::http_api::HttpApi;
-
-fn get_version_info_url(base_url: &str) -> String {
-    format!("{}/version", base_url)
-}
 
 impl From<ureq::Error> for GetVersionInfoError {
     fn from(error: ureq::Error) -> Self {

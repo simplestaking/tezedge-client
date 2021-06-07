@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 use serde::{Serialize, Deserialize};
 
+use crate::BoxFuture;
 use crate::api::TransportError;
 
 #[derive(thiserror::Error, Debug)]
@@ -29,4 +30,12 @@ pub type GetProtocolInfoResult = Result<ProtocolInfo, GetProtocolInfoError>;
 
 pub trait GetProtocolInfo {
     fn get_protocol_info(&self) -> GetProtocolInfoResult;
+}
+
+pub trait GetProtocolInfoAsync {
+    fn get_protocol_info<'a>(&'a self) -> BoxFuture<'a, GetProtocolInfoResult>;
+}
+
+pub(crate) fn get_protocol_info_url(base_url: &str) -> String {
+    format!("{}/chains/main/blocks/head/protocols", base_url)
 }

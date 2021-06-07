@@ -1,13 +1,10 @@
 use types::{NewOperationGroup, NewOperationWithKind};
 use crate::api::{
+    run_operation_url,
     GetChainID, RunOperation, RunOperationResult,
     TransportError, RunOperationError, RunOperationJson,
 };
 use crate::http_api::HttpApi;
-
-fn run_operation_url(base_url: &str) -> String {
-    format!("{}/chains/main/blocks/head/helpers/scripts/run_operation", base_url)
-}
 
 impl From<ureq::Error> for RunOperationError {
     fn from(error: ureq::Error) -> Self {

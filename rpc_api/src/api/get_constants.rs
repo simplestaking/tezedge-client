@@ -1,5 +1,7 @@
 use serde::{Serialize, Deserialize};
 
+use crate::BoxFuture;
+
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Constants {
     pub hard_gas_limit_per_block: String,
@@ -12,4 +14,8 @@ pub type GetConstantsResult = Result<Constants, ()>;
 
 pub trait GetConstants {
     fn get_constants(&self) -> GetConstantsResult;
+}
+
+pub trait GetConstantsAsync {
+    fn get_constants<'a>(&'a self) -> BoxFuture<'a, GetConstantsResult>;
 }

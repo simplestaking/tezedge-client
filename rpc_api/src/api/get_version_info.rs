@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 use serde::{Serialize, Deserialize};
 
+use crate::BoxFuture;
 use crate::api::TransportError;
 use types::Network;
 
@@ -74,4 +75,12 @@ pub type GetVersionInfoResult = Result<VersionInfo, GetVersionInfoError>;
 
 pub trait GetVersionInfo {
     fn get_version_info(&self) -> GetVersionInfoResult;
+}
+
+pub trait GetVersionInfoAsync {
+    fn get_version_info<'a>(&'a self) -> BoxFuture<'a, GetVersionInfoResult>;
+}
+
+pub(crate) fn get_version_info_url(base_url: &str) -> String {
+    format!("{}/version", base_url)
 }

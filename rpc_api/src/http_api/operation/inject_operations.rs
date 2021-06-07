@@ -1,14 +1,11 @@
 use serde_json::Value as SerdeValue;
 
 use crate::api::{
+    inject_operations_url,
     InjectOperations, InjectOperationsResult,
     TransportError, InjectOperationsError,
 };
 use crate::http_api::HttpApi;
-
-fn inject_operations_url(base_url: &str) -> String {
-    format!("{}/injection/operation", base_url)
-}
 
 impl From<ureq::Error> for InjectOperationsError {
     fn from(error: ureq::Error) -> Self {

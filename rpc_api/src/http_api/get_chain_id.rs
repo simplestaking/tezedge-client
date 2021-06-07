@@ -1,9 +1,5 @@
-use crate::api::{TransportError, GetChainID, GetChainIDResult, GetChainIDError};
+use crate::api::{get_chain_id_url, TransportError, GetChainID, GetChainIDResult, GetChainIDError};
 use crate::http_api::HttpApi;
-
-fn get_chain_id_url(base_url: &str) -> String {
-    format!("{}/chains/main/chain_id", base_url)
-}
 
 impl From<ureq::Error> for GetChainIDError {
     fn from(error: ureq::Error) -> Self {

@@ -1,20 +1,12 @@
 use serde::Deserialize;
 
 use types::ImplicitAddress;
-use crypto::ToBase58Check;
 use crate::api::{
+    get_contract_counter_url,
     GetContractCounter, GetContractCounterResult,
     TransportError, GetContractCounterError, GetContractCounterErrorKind,
 };
 use crate::http_api::HttpApi;
-
-fn get_contract_counter_url(base_url: &str, addr: &ImplicitAddress) -> String {
-    format!(
-        "{}/chains/main/blocks/head/context/contracts/{}/counter",
-        base_url,
-        addr.to_base58check(),
-    )
-}
 
 impl From<ureq::Error> for GetContractCounterErrorKind {
     fn from(error: ureq::Error) -> Self {
@@ -57,23 +49,13 @@ impl Into<u64> for ContractCounter {
     }
 }
 
-#[inline]
-fn build_error<E>(address: &ImplicitAddress, kind: E) -> GetContractCounterError
-    where E: Into<GetContractCounterErrorKind>,
-{
-    GetContractCounterError {
-        address: address.clone(),
-        kind: kind.into(),
-    }
-}
-
 impl GetContractCounter for HttpApi {
     fn get_contract_counter(&self, addr: &ImplicitAddress) -> GetContractCounterResult {
         Ok(self.client.get(&get_contract_counter_url(&self.base_url, addr))
            .call()
-           .map_err(|err| build_error(addr, err))?
+           .map_err(|err| GetContractCounterError::new(addr, err))?
            .into_json::<ContractCounter>()
-           .map_err(|err| build_error(addr, err))?
+           .map_err(|err| GetContractCounterError::new(addr, err))?
            .into())
     }
 }

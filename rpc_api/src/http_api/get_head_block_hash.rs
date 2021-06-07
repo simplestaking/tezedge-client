@@ -1,12 +1,9 @@
 use crate::api::{
+    get_head_block_hash_url,
     GetHeadBlockHash, GetHeadBlockHashResult,
     TransportError, GetHeadBlockHashError,
 };
 use crate::http_api::HttpApi;
-
-fn get_head_block_hash_url(base_url: &str) -> String {
-    format!("{}/chains/main/blocks/head/hash", base_url)
-}
 
 impl From<ureq::Error> for GetHeadBlockHashError {
     fn from(error: ureq::Error) -> Self {

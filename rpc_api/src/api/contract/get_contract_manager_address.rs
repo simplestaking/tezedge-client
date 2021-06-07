@@ -2,7 +2,8 @@ use std::fmt::{self, Display};
 
 use types::{Address, ImplicitAddress, OriginatedAddress, FromPrefixedBase58CheckError};
 use crypto::ToBase58Check;
-use crate::api::{TransportError, GetContractStorage, GetContractStorageError, GetContractStorageErrorKind};
+use crate::BoxFuture;
+use crate::api::{TransportError, GetContractStorage, GetContractStorageAsync, GetContractStorageError, GetContractStorageErrorKind};
 
 #[derive(thiserror::Error, Debug)]
 #[error(transparent)]
@@ -62,6 +63,17 @@ pub trait GetContractManagerAddress {
     fn get_contract_manager_address(&self, addr: &Address) -> GetContractManagerAddressResult;
 }
 
+pub trait GetContractManagerAddressAsync {
+    /// Get manager address for given contract.
+    ///
+    /// - If given address is `ImplicitAddress`, manager address = contract address.
+    /// - If given address is `OriginatedAddress`, manager address will
+    /// be the one, that originated this contract.
+    fn get_contract_manager_address<'a>(
+        &'a self,
+        addr: &'a Address,
+    ) -> BoxFuture<'a, GetContractManagerAddressResult>;
+}
 
 #[inline]
 fn build_error<E>(address: &OriginatedAddress, kind: E) -> GetContractManagerAddressError
@@ -73,6 +85,17 @@ fn build_error<E>(address: &OriginatedAddress, kind: E) -> GetContractManagerAdd
     }
 }
 
+fn get_address_from_contract_storage(
+    contract_addr: &OriginatedAddress,
+    storage: serde_json::Value,
+) -> Result<ImplicitAddress, GetContractManagerAddressError>
+{
+    let manager_str = storage["string"].as_str()
+        .ok_or_else(|| build_error(contract_addr, GetContractManagerAddressErrorKind::UnsupportedContract))?;
+    ImplicitAddress::from_base58check(manager_str)
+        .map_err(|err| build_error(contract_addr, err))
+}
+
 impl<T> GetContractManagerAddress for T
     where T: GetContractStorage,
 {
@@ -80,11 +103,32 @@ impl<T> GetContractManagerAddress for T
         Ok(match addr {
             Address::Implicit(addr) => addr.clone(),
             Address::Originated(addr) => {
-                let storage = self.get_contract_storage(addr)?;
-                let manager_str = storage["string"].as_str()
-                    .ok_or_else(|| build_error(addr, GetContractManagerAddressErrorKind::UnsupportedContract))?;
-                ImplicitAddress::from_base58check(manager_str)
-                    .map_err(|err| build_error(addr, err))?
+                get_address_from_contract_storage(
+                    addr,
+                    self.get_contract_storage(addr)?,
+                )?
+            }
+        })
+    }
+}
+
+impl<T> GetContractManagerAddressAsync for T
+    where T: GetContractStorageAsync,
+{
+    fn get_contract_manager_address<'a>(
+        &'a self,
+        addr: &'a Address,
+    ) -> BoxFuture<'a, GetContractManagerAddressResult>
+    {
+        Box::pin(async move {
+            match addr {
+                Address::Implicit(addr) => Ok(addr.clone()),
+                Address::Originated(addr) => {
+                    Ok(get_address_from_contract_storage(
+                        addr,
+                        self.get_contract_storage(addr).await?,
+                    )?)
+                }
             }
         })
     }

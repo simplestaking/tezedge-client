@@ -1,14 +1,11 @@
 use serde::Deserialize;
 
 use crate::api::{
+    get_protocol_info_url,
     GetProtocolInfo, GetProtocolInfoResult, ProtocolInfo,
     TransportError, GetProtocolInfoError,
 };
 use crate::http_api::HttpApi;
-
-fn get_protocol_info_url(base_url: &str) -> String {
-    format!("{}/chains/main/blocks/head/protocols", base_url)
-}
 
 impl From<ureq::Error> for GetProtocolInfoError {
     fn from(error: ureq::Error) -> Self {

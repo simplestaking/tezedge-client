@@ -1,5 +1,6 @@
 use std::fmt::{self, Display};
 
+use crate::BoxFuture;
 use crate::api::TransportError;
 
 #[derive(thiserror::Error, Debug)]
@@ -25,4 +26,15 @@ pub trait InjectOperations {
         &self,
         operation_with_signature: &str,
     ) -> InjectOperationsResult;
+}
+
+pub trait InjectOperationsAsync {
+    fn inject_operations<'a>(
+        &'a self,
+        operation_with_signature: &'a str,
+    ) -> BoxFuture<'a, InjectOperationsResult>;
+}
+
+pub(crate) fn inject_operations_url(base_url: &str) -> String {
+    format!("{}/injection/operation", base_url)
 }

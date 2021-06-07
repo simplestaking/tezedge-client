@@ -1,13 +1,10 @@
 use types::{NewOperationGroup, NewOperationWithKind};
 use crate::api::{
+    preapply_operations_url,
     PreapplyOperations, PreapplyOperationsResult,
     TransportError, PreapplyOperationsError,
 };
 use crate::http_api::HttpApi;
-
-fn preapply_operations_url(base_url: &str) -> String {
-    format!("{}/chains/main/blocks/head/helpers/preapply/operations", base_url)
-}
 
 impl From<ureq::Error> for PreapplyOperationsError {
     fn from(error: ureq::Error) -> Self {

@@ -1,5 +1,6 @@
 use std::fmt::{self, Display};
 
+use crate::BoxFuture;
 use crate::api::TransportError;
 
 #[derive(thiserror::Error, Debug)]
@@ -22,4 +23,12 @@ pub type GetChainIDResult = Result<String, GetChainIDError>;
 
 pub trait GetChainID {
     fn get_chain_id(&self) -> GetChainIDResult;
+}
+
+pub trait GetChainIDAsync {
+    fn get_chain_id<'a>(&'a self) -> BoxFuture<'a, GetChainIDResult>;
+}
+
+pub(crate) fn get_chain_id_url(base_url: &str) -> String {
+    format!("{}/chains/main/chain_id", base_url)
 }
