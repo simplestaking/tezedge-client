@@ -21,13 +21,13 @@ impl Display for GetVersionInfoError {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Default, Clone)]
 pub struct NodeVersion {
     major: usize,
     minor: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Default, Clone)]
 pub struct NetworkVersion {
     pub chain_name: String,
     pub distributed_db_version: usize,
@@ -47,13 +47,13 @@ impl NetworkVersion {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Default, Clone)]
 pub struct CommitInfo {
     pub commit_hash: String,
     pub commit_date: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Default, Clone)]
 pub struct VersionInfo {
     #[serde(rename = "version")]
     pub node_version: NodeVersion,

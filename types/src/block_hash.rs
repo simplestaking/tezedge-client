@@ -7,7 +7,7 @@ use super::FromPrefixedBase58CheckError;
 
 type BlockHashInner = [u8; 32];
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct BlockHash(BlockHashInner);
 
 impl BlockHash {

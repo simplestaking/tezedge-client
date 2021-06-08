@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::BoxFuture;
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Default)]
 pub struct Constants {
     pub hard_gas_limit_per_block: String,
     pub hard_storage_limit_per_operation: String,

@@ -20,7 +20,7 @@ impl Display for GetProtocolInfoError {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Default)]
 pub struct ProtocolInfo {
     pub protocol_hash: String,
     pub next_protocol_hash: String,
