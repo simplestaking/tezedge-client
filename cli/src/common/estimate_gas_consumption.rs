@@ -1,4 +1,4 @@
-use lib::{NewOperationGroup, NewTransactionParameters, Address};
+use lib::{NewOperationGroup, NewTransactionParameters, ManagerParameter, Address};
 use lib::api::{RunOperation, RunOperationError, RunOperationContents};
 
 #[derive(PartialEq, Debug, Clone)]
@@ -38,15 +38,17 @@ pub fn estimate_gas_consumption<A>(
     let tx_additional_gas = op.transaction.as_ref()
         .map(|op| {
             use NewTransactionParameters::*;
+            use ManagerParameter::*;
             match op.parameters.as_ref() {
-                Some(Transfer { to, .. }) => {
+                Some(Manager(Transfer { to, .. })) => {
                     match to {
                         Address::Implicit(_) => 1427,
                         Address::Originated(_) => 2863,
                     }
                 }
-                Some(SetDelegate(_)) => 1000,
-                Some(CancelDelegate) => 1000,
+                Some(Manager(SetDelegate(_))) => 1000,
+                Some(Manager(CancelDelegate)) => 1000,
+                Some(Custom { .. }) => 0, // Unknown gas consumption
                 None => 0,
             }
         })

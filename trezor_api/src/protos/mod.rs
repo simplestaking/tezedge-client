@@ -13,7 +13,7 @@ pub use messages_management::*;
 use types::{
     Forge, Address, ImplicitAddress, OriginatedAddress, OriginatedAddressWithManager,
     NewOperationGroup, NewRevealOperation, NewTransactionOperation, NewDelegationOperation,
-    NewOriginationOperation, NewTransactionParameters,
+    NewOriginationOperation, NewTransactionParameters, ManagerParameter,
 };
 
 impl Into<TezosSignTx_TezosContractID> for Address {
@@ -111,8 +111,11 @@ impl Into<TezosSignTx_TezosTransactionOp> for NewTransactionOperation {
         new_tx.set_storage_limit(self.storage_limit);
 
         match self.parameters {
-            Some(parameters) => {
-                new_tx.set_parameters_manager(parameters.into());
+            Some(NewTransactionParameters::Manager(params)) => {
+                new_tx.set_parameters_manager(params.into());
+            }
+            Some(params @ NewTransactionParameters::Custom { .. }) => {
+                new_tx.set_parameters(params.forge().take());
             }
             None => {}
         };
@@ -157,7 +160,7 @@ impl Into<TezosSignTx_TezosOriginationOp> for NewOriginationOperation {
     }
 }
 
-impl Into<TezosSignTx_TezosTransactionOp_TezosParametersManager> for NewTransactionParameters {
+impl Into<TezosSignTx_TezosTransactionOp_TezosParametersManager> for ManagerParameter {
     /// Creates `TezosSignTx_TezosTransactionOp_TezosParametersManager`, protobuf type for Trezor.
     fn into(self) -> TezosSignTx_TezosTransactionOp_TezosParametersManager {
         let mut params = TezosSignTx_TezosTransactionOp_TezosParametersManager::new();

@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 
 use utils::estimate_operation_fee;
 use crate::{Forge, ImplicitAddress, ImplicitOrOriginatedWithManager, OriginatedAddressWithManager};
-use super::{NewOperation, NewTransactionOperation, NewTransactionParameters};
+use super::{NewOperation, NewTransactionOperation, NewTransactionParameters, ManagerParameter};
 
 #[derive(Debug, Clone)]
 pub struct NewDelegationOperationBuilder {
@@ -46,8 +46,8 @@ impl NewDelegationOperationBuilder {
                 manager,
             }) => {
                 let parameters = match self.delegate_to {
-                    Some(delegate) => NewTransactionParameters::SetDelegate(delegate),
-                    None => NewTransactionParameters::CancelDelegate,
+                    Some(delegate) => ManagerParameter::SetDelegate(delegate),
+                    None => ManagerParameter::CancelDelegate,
                 };
                 NewOperation::Transaction(NewTransactionOperation {
                     source: manager,
@@ -57,7 +57,7 @@ impl NewDelegationOperationBuilder {
                     gas_limit: self.gas_limit,
                     storage_limit: self.storage_limit,
                     amount: 0,
-                    parameters: Some(parameters),
+                    parameters: Some(NewTransactionParameters::Manager(parameters)),
                 })
             }
         }

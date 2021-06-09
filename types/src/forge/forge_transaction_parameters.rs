@@ -1,4 +1,4 @@
-use crate::{Address, NewTransactionParameters};
+use crate::{Address, NewTransactionParameters, ManagerParameter};
 use super::{Forge, Forged};
 use super::micheline::{Micheline, MichelineEntrypoint, MichelinePrim, PrimType};
 
@@ -6,7 +6,7 @@ fn prim(prim_type: PrimType) -> MichelinePrim {
     MichelinePrim::new(prim_type)
 }
 
-impl Forge for NewTransactionParameters {
+impl Forge for ManagerParameter {
     fn forge(&self) -> Forged {
         let mut res = MichelineEntrypoint::Do.forge().take();
 
@@ -85,5 +85,21 @@ impl Forge for NewTransactionParameters {
         res.extend(value_bytes.forge());
 
         Forged(res)
+    }
+}
+
+impl Forge for NewTransactionParameters {
+    fn forge(&self) -> Forged {
+        match self {
+            Self::Manager(manager_params) => manager_params.forge(),
+            Self::Custom { entrypoint, data } => {
+                let mut res = entrypoint.forge().take();
+
+                // TODO: maybe needs to be forged as array as well?
+                res.extend(data.forge().take());
+
+                Forged(res)
+            }
+        }
     }
 }

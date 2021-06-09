@@ -4,6 +4,9 @@ pub use new_operation::*;
 mod new_reveal_operation;
 pub use new_reveal_operation::*;
 
+mod manager_parameter;
+pub use manager_parameter::*;
+
 mod new_transaction_parameters;
 pub use new_transaction_parameters::*;
 

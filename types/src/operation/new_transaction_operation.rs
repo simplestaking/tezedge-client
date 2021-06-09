@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 use crate::{
-    Forge, NewTransactionParameters, Address, ImplicitAddress,
+    Forge, NewTransactionParameters, ManagerParameter, Address, ImplicitAddress,
     ImplicitOrOriginatedWithManager, OriginatedAddressWithManager,
 };
 use utils::estimate_operation_fee;
@@ -42,10 +42,12 @@ impl NewTransactionOperationBuilder {
                     counter: self.counter,
                     gas_limit: self.gas_limit,
                     storage_limit: self.storage_limit,
-                    parameters: Some(NewTransactionParameters::Transfer {
-                        to: self.destination,
-                        amount: self.amount,
-                    }),
+                    parameters: Some(NewTransactionParameters::Manager(
+                        ManagerParameter::Transfer {
+                            to: self.destination,
+                            amount: self.amount,
+                        }
+                    )),
                 }
             }
         }
