@@ -16,8 +16,7 @@ fn contract_code_forged() -> Forged {
     Forged::new_unchecked(hex::decode(s).unwrap())
 }
 
-struct IntialStorage {
-
+struct InitialStorage {
 }
 
 impl From<InitialStorage> for Micheline {
