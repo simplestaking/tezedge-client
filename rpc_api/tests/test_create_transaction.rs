@@ -10,7 +10,7 @@ use types::{Address, Forge, Network, NewOperationGroup, NewTransactionOperationB
 use utils::parse_float_amount;
 
 #[tokio::test]
-async fn create_transaction() {
+async fn test_create_transaction() {
     let (_, async_api) = build_http_apis();
     let account = account_1();
 
