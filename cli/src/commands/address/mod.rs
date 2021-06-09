@@ -11,6 +11,10 @@ pub enum Address {
 }
 
 impl Address {
+    pub fn get_endpoint(&self) -> Option<&str> {
+        None
+    }
+
     pub fn execute(self) -> Result<(), CommandError> {
         match self {
             Address::Get(c) => c.execute(),

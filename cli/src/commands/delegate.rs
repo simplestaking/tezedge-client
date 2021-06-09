@@ -101,6 +101,10 @@ impl RawOperationCommand for Delegate {
 }
 
 impl Delegate {
+    pub fn get_endpoint(&self) -> Option<&str> {
+        Some(self.endpoint.as_str())
+    }
+
     pub fn execute(self) -> Result<(), CommandError> {
         if self.cancel && self.to.is_some() {
             exit_with_error(format!(

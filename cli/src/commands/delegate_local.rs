@@ -81,6 +81,10 @@ pub struct DelegateLocal {
 }
 
 impl DelegateLocal {
+    pub fn get_endpoint(&self) -> Option<&str> {
+        Some(self.endpoint.as_str())
+    }
+
     fn public_key(&self) -> Result<PublicKey, ParseKeyError> {
         PublicKey::from_base58check(&self.public_key)
             .map_err(|error| ParseKeyError {

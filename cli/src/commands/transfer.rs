@@ -99,6 +99,10 @@ impl RawOperationCommand for Transfer {
 }
 
 impl Transfer {
+    pub fn get_endpoint(&self) -> Option<&str> {
+        Some(self.endpoint.as_str())
+    }
+
     fn get_amount(&self) -> u64 {
         match parse_float_amount(&self.amount) {
             Ok(amount) => amount,

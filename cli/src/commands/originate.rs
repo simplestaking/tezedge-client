@@ -82,6 +82,10 @@ pub struct Originate {
 }
 
 impl Originate {
+    pub fn get_endpoint(&self) -> Option<&str> {
+        Some(self.endpoint.as_str())
+    }
+
     fn rpc(&self) -> HttpApi {
         HttpApi::new(self.endpoint.clone())
     }
