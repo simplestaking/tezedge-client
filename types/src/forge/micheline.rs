@@ -84,10 +84,29 @@ impl Forge for MichelineEntrypoint {
 }
 
 #[derive(PartialEq, Debug, Clone)]
+pub enum Annotation {
+    Type(String),
+    Field(String),
+    Variable(String),
+}
+
+impl ToString for Annotation {
+    fn to_string(&self) -> String {
+        let (prefix, value) = match self {
+            Self::Type(val) => (":", val),
+            Self::Field(val) => ("%", val),
+            Self::Variable(val) => ("@", val),
+        };
+
+        format!("{}{}", prefix, value)
+    }
+}
+
+#[derive(PartialEq, Debug, Clone)]
 pub struct MichelinePrim {
     pub prim_type: PrimType,
     pub args: Option<Vec<Micheline>>,
-    // TODO: implement annotations
+    pub annots: Option<Vec<Annotation>>,
 }
 
 impl MichelinePrim {
@@ -95,19 +114,35 @@ impl MichelinePrim {
         Self {
             prim_type,
             args: None,
+            annots: None,
         }
     }
 
+    /// Replaces current args list with `args`.
     pub fn with_args(mut self, args: Vec<Micheline>) -> Self {
         self.args = Some(args);
         self
     }
 
-    /// Adds arg to the `args` list.
+    /// Adds arg to current `args` list.
     pub fn with_arg(mut self, arg: Micheline) -> Self {
         self.args
             .get_or_insert_with(|| vec![])
             .push(arg);
+        self
+    }
+
+    /// Replaces current annotations list with `annots`.
+    pub fn with_annots(mut self, annots: Vec<Annotation>) -> Self {
+        self.annots = Some(annots);
+        self
+    }
+
+    /// Adds annotation to current annotations list.
+    pub fn with_annot(mut self, annotation: Annotation) -> Self {
+        self.annots
+            .get_or_insert_with(|| vec![])
+            .push(annotation);
         self
     }
 }
@@ -117,9 +152,9 @@ impl Forge for MichelinePrim {
         let mut res = vec![];
 
         let args_len = self.args.as_ref().map(Vec::len).unwrap_or(0);
-        let annotations_len = 0;
+        let annots_len = self.annots.as_ref().map(Vec::len).unwrap_or(0);
 
-        let tag = 9.min(args_len * 2 + 3 + annotations_len);
+        let tag = 9.min(args_len * 2 + 3 + annots_len);
 
         res.push(tag as u8);
         res.push(self.prim_type.into());
@@ -135,6 +170,20 @@ impl Forge for MichelinePrim {
                     // the size of the args to the forged bytes.
                     res.extend(args.forge());
                 }
+            }
+            _ => {}
+        }
+
+        match &self.annots {
+            Some(annots) if annots.len() > 0 => {
+                res.extend(
+                    annots.iter()
+                        .map(|annot| annot.to_string())
+                        .collect::<Vec<String>>()
+                        .join(" ")
+                        .forge()
+                        .take()
+                );
             }
             _ => {}
         }
