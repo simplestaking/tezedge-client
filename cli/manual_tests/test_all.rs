@@ -89,7 +89,7 @@ impl TestAll {
         let target_dir = std::env::var("CARGO_TARGET_DIR")
             .unwrap_or_else(|_| String::from("target"));
         let cli_path = format!(
-            "{}/{}/cli",
+            "{}/{}/tezedge-client",
             target_dir,
             if self.release { "release" } else { "debug" },
         );
