@@ -19,6 +19,8 @@ pub use get_head_block_hash::*;
 mod get_manager_public_key;
 pub use get_manager_public_key::*;
 
+mod monitor_heads;
+pub use monitor_heads::*;
 
 pub struct HttpApi {
     base_url: String,

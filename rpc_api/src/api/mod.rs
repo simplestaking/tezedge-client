@@ -26,6 +26,9 @@ pub use get_chain_id::*;
 mod get_manager_public_key;
 pub use get_manager_public_key::*;
 
+mod monitor_heads;
+pub use monitor_heads::*;
+
 #[derive(thiserror::Error, Debug)]
 #[error(transparent)]
 pub struct TransportError(pub Box<dyn std::error::Error>);

@@ -30,3 +30,4 @@ pub mod http_api;
 pub mod http_api_async;
 
 pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
+pub type BoxStream<'a, T> = futures_core::stream::BoxStream<'a, T>;
