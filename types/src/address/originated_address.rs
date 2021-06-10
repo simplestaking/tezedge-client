@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::fmt::{self, Debug};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crypto::{Prefix, WithPrefix, WithoutPrefix};
@@ -11,7 +12,7 @@ type OriginatedAddressInner = [u8; ADDRESS_LEN];
 /// Originated public key hash of the account.
 ///
 /// Originated are essentially smart contracts, which are prefixed with (KT1).
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct OriginatedAddress(OriginatedAddressInner);
 
 impl OriginatedAddress {
@@ -46,6 +47,12 @@ impl ToBase58Check for OriginatedAddress {
 impl AsRef<OriginatedAddressInner> for OriginatedAddress {
     fn as_ref(&self) -> &OriginatedAddressInner {
         &self.0
+    }
+}
+
+impl Debug for OriginatedAddress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "OriginatedAddress(\"{}\")", self.to_base58check())
     }
 }
 

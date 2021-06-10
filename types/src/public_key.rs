@@ -1,5 +1,6 @@
 use std::convert::TryInto;
-use serde::{Serialize, Serializer};
+use std::fmt::{self, Debug};
+use serde::{Serialize, Serializer, Deserialize, Deserializer};
 
 use crypto::{blake2b, Prefix, WithPrefix, WithoutPrefix, NotMatchingPrefixError};
 use crypto::base58check::{FromBase58Check, ToBase58Check};
@@ -10,7 +11,7 @@ pub const PUBLIC_KEY_LEN: usize = 32;
 type PublicKeyInner = [u8; PUBLIC_KEY_LEN];
 
 #[allow(non_camel_case_types)]
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum PublicKey {
     edpk([u8; 32]),
     sppk([u8; 33]),
@@ -97,6 +98,12 @@ impl AsRef<[u8]> for PublicKey {
     }
 }
 
+impl Debug for PublicKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "PublicKey(\"{}\")", self.to_base58check())
+    }
+}
+
 impl Serialize for PublicKey {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where S: Serializer
@@ -104,5 +111,18 @@ impl Serialize for PublicKey {
         serializer.serialize_str(
             &self.to_base58check()
         )
+    }
+}
+
+impl<'de> Deserialize<'de> for PublicKey {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: Deserializer<'de>,
+    {
+        let encoded = String::deserialize(deserializer)?;
+
+        Self::from_base58check(&encoded)
+            .map_err(|err| {
+                serde::de::Error::custom(err)
+            })
     }
 }

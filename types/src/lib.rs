@@ -9,6 +9,9 @@ pub use network::*;
 mod block_hash;
 pub use block_hash::*;
 
+mod operation_hash;
+pub use operation_hash::*;
+
 mod address;
 pub use address::*;
 

@@ -1,28 +1,28 @@
-use std::fmt::{self, Debug};
 use std::convert::TryInto;
+use std::fmt::{self, Debug};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crypto::{Prefix, WithPrefix, WithoutPrefix};
 use crypto::base58check::{FromBase58Check, ToBase58Check};
 use super::FromPrefixedBase58CheckError;
 
-type BlockHashInner = [u8; 32];
+type OperationHashInner = [u8; 32];
 
 #[derive(Eq, PartialEq, Clone)]
-pub struct BlockHash(BlockHashInner);
+pub struct OperationHash(OperationHashInner);
 
-impl BlockHash {
+impl OperationHash {
     /// Parse base58check.
     ///
     /// # Example
     /// ```rust
-    /// # use types::BlockHash;
-    /// BlockHash::from_base58check("BKrTZWWSV7j5J31WiE1GB7LU8Mn12qtdBQ6z3UGRHhaYBU7jLAr").unwrap();
+    /// # use types::OperationHash;
+    /// OperationHash::from_base58check("onvQSsf5GZhrLPM98iHxBDk3Q1Xv3gQVGnicEpoyYMxNYxPdBhL").unwrap();
     /// ```
     pub fn from_base58check(encoded: &str) -> Result<Self, FromPrefixedBase58CheckError> {
-        let key_bytes: BlockHashInner = encoded
+        let key_bytes: OperationHashInner = encoded
             .from_base58check()?
-            .without_prefix(Prefix::B)?
+            .without_prefix(Prefix::operation)?
             .try_into()
             .or(Err(FromPrefixedBase58CheckError::InvalidSize))?;
 
@@ -30,7 +30,7 @@ impl BlockHash {
     }
 }
 
-impl ToBase58Check for BlockHash {
+impl ToBase58Check for OperationHash {
     fn to_base58check(&self) -> String {
         self.0
             .with_prefix(Prefix::B)
@@ -38,19 +38,19 @@ impl ToBase58Check for BlockHash {
     }
 }
 
-impl AsRef<BlockHashInner> for BlockHash {
-    fn as_ref(&self) -> &BlockHashInner {
+impl AsRef<OperationHashInner> for OperationHash {
+    fn as_ref(&self) -> &OperationHashInner {
         &self.0
     }
 }
 
-impl Debug for BlockHash {
+impl Debug for OperationHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "BlockHash(\"{}\")", self.to_base58check())
+        write!(f, "OperationHash(\"{}\")", self.to_base58check())
     }
 }
 
-impl Serialize for BlockHash {
+impl Serialize for OperationHash {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where S: Serializer
     {
@@ -60,7 +60,7 @@ impl Serialize for BlockHash {
     }
 }
 
-impl<'de> Deserialize<'de> for BlockHash {
+impl<'de> Deserialize<'de> for OperationHash {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: Deserializer<'de>,
     {

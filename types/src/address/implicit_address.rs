@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::fmt::{self, Debug};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crypto::{Prefix, WithPrefix, WithoutPrefix, NotMatchingPrefixError};
@@ -12,7 +13,7 @@ type ImplicitAddressInner = [u8; ADDRESS_LEN];
 ///
 /// Implicit are normal accounts (NOT smart contracts) prefixed with (tz1, tz2, tz3).
 #[allow(non_camel_case_types)]
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum ImplicitAddress {
     tz1(ImplicitAddressInner),
     tz2(ImplicitAddressInner),
@@ -69,6 +70,17 @@ impl AsRef<ImplicitAddressInner> for ImplicitAddress {
             Self::tz1(k) => &k,
             Self::tz2(k) => &k,
             Self::tz3(k) => &k,
+        }
+    }
+}
+
+impl Debug for ImplicitAddress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let addr = self.to_base58check();
+        match self {
+            Self::tz1(_) => write!(f, "ImplicitAddress::tz1(\"{}\")", addr),
+            Self::tz2(_) => write!(f, "ImplicitAddress::tz2(\"{}\")", addr),
+            Self::tz3(_) => write!(f, "ImplicitAddress::tz3(\"{}\")", addr),
         }
     }
 }
