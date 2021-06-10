@@ -26,10 +26,10 @@ impl Display for MonitorHeadsError {
 
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Clone)]
 pub struct BlockHead {
-    level: u64,
-    hash: BlockHash,
-    predecessor: BlockHash,
-    timestamp: String,
+    pub level: u64,
+    pub hash: BlockHash,
+    pub predecessor: BlockHash,
+    pub timestamp: String,
 }
 
 pub type MonitorHeadsResult = Result<BlockHead, MonitorHeadsError>;

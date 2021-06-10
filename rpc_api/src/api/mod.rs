@@ -1,6 +1,9 @@
 /// Defines traits with their types, errors, of the available
 /// api actions/operations.
 
+mod block;
+pub use block::*;
+
 mod operation;
 pub use operation::*;
 
@@ -15,9 +18,6 @@ pub use get_constants::*;
 
 mod get_protocol_info;
 pub use get_protocol_info::*;
-
-mod get_head_block_hash;
-pub use get_head_block_hash::*;
 
 mod get_chain_id;
 pub use get_chain_id::*;

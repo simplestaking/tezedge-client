@@ -4,6 +4,9 @@ pub use contract::*;
 mod operation;
 pub use operation::*;
 
+mod block;
+pub use block::*;
+
 mod get_chain_id;
 pub use get_chain_id::*;
 
@@ -12,9 +15,6 @@ pub use get_version_info::*;
 
 mod get_protocol_info;
 pub use get_protocol_info::*;
-
-mod get_head_block_hash;
-pub use get_head_block_hash::*;
 
 mod get_manager_public_key;
 pub use get_manager_public_key::*;
