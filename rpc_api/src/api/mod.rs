@@ -32,6 +32,9 @@ pub use monitor_heads::*;
 mod monitor_operations;
 pub use monitor_operations::*;
 
+mod monitor_contracts;
+pub use monitor_contracts::*;
+
 #[derive(thiserror::Error, Debug)]
 #[error(transparent)]
 pub struct TransportError(pub Box<dyn std::error::Error + Send>);

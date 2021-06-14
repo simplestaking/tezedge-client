@@ -12,7 +12,7 @@ type OriginatedAddressInner = [u8; ADDRESS_LEN];
 /// Originated public key hash of the account.
 ///
 /// Originated are essentially smart contracts, which are prefixed with (KT1).
-#[derive(PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct OriginatedAddress(OriginatedAddressInner);
 
 impl OriginatedAddress {

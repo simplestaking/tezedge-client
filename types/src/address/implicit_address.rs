@@ -13,7 +13,7 @@ type ImplicitAddressInner = [u8; ADDRESS_LEN];
 ///
 /// Implicit are normal accounts (NOT smart contracts) prefixed with (tz1, tz2, tz3).
 #[allow(non_camel_case_types)]
-#[derive(PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub enum ImplicitAddress {
     tz1(ImplicitAddressInner),
     tz2(ImplicitAddressInner),

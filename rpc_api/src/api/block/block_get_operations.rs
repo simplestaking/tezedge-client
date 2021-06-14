@@ -27,6 +27,16 @@ impl Display for BlockGetOperationsError {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+pub struct BlockOperationResultOrigination {
+
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct BlockOperationMetadataOrigination {
+    pub operation_result: BlockOperationResultOrigination,
+}
+
+#[derive(Deserialize, Debug, Clone)]
 pub struct BlockOperationContentReveal {
     pub source: ImplicitAddress,
     pub public_key: PublicKey,
@@ -85,6 +95,7 @@ pub struct BlockOperationContentOrigination {
     #[serde(with = "utils::serde_str")]
     pub storage_limit: u64,
     pub script: Option<serde_json::Value>,
+    pub metadata: BlockOperationMetadataOrigination,
 }
 
 #[derive(Debug, Clone)]
@@ -124,8 +135,9 @@ impl<'de> Deserialize<'de> for BlockOperationContent {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct BlockOperation {
-    hash: OperationHash,
-    contents: Vec<BlockOperationContent>,
+    pub hash: OperationHash,
+    pub branch: BlockHash,
+    pub contents: Vec<BlockOperationContent>,
 }
 
 pub type BlockGetOperationsResult = Result<Vec<BlockOperation>, BlockGetOperationsError>;

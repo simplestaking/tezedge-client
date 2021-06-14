@@ -5,7 +5,7 @@ use crypto::base58check::{FromBase58Check, ToBase58Check};
 use crate::{FromPrefixedBase58CheckError, ImplicitAddress, OriginatedAddress};
 
 /// Public key hash of the account.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub enum Address {
     Implicit(ImplicitAddress),
     Originated(OriginatedAddress),
