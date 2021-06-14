@@ -33,7 +33,7 @@ pub trait GetProtocolInfo {
 }
 
 pub trait GetProtocolInfoAsync {
-    fn get_protocol_info<'a>(&'a self) -> BoxFuture<'a, GetProtocolInfoResult>;
+    fn get_protocol_info(&self) -> BoxFuture<'static, GetProtocolInfoResult>;
 }
 
 pub(crate) fn get_protocol_info_url(base_url: &str) -> String {

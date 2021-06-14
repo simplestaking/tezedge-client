@@ -60,10 +60,10 @@ pub trait GetManagerPublicKeyAsync {
     ///
     /// - If account is not yet revealed, it will return `Ok(None)`.
     /// - Otherwise it will return `Ok(PublicKey)`.
-    fn get_manager_public_key<'a>(
-        &'a self,
-        addr: &'a Address,
-    ) -> BoxFuture<'a, GetManagerPublicKeyResult>;
+    fn get_manager_public_key(
+        &self,
+        addr: &Address,
+    ) -> BoxFuture<'static, GetManagerPublicKeyResult>;
 }
 
 /// Get manager key

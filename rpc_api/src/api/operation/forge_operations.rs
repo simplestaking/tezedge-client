@@ -11,8 +11,8 @@ pub trait ForgeOperations {
 }
 
 pub trait ForgeOperationsAsync {
-    fn forge_operations<'a>(
-        &'a self,
-        operation_group: &'a NewOperationGroup,
-    ) -> BoxFuture<'a, ForgeOperationsResult>;
+    fn forge_operations(
+        &self,
+        operation_group: &NewOperationGroup,
+    ) -> BoxFuture<'static, ForgeOperationsResult>;
 }

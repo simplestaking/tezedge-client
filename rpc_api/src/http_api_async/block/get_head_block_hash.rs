@@ -21,11 +21,13 @@ impl From<reqwest::Error> for GetHeadBlockHashError {
 }
 
 impl GetHeadBlockHashAsync for HttpApi {
-    fn get_head_block_hash<'a>(&'a self) -> BoxFuture<'a, GetHeadBlockHashResult> {
+    fn get_head_block_hash(&self) -> BoxFuture<'static, GetHeadBlockHashResult> {
+        let req = self.client.get(&get_head_block_hash_url(&self.base_url));
+
         Box::pin(async move {
-            Ok(self.client.get(&get_head_block_hash_url(&self.base_url))
-               .send().await?
-               .json().await?)
+            Ok(req
+                .send().await?
+                .json().await?)
         })
     }
 }

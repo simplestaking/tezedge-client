@@ -1,5 +1,4 @@
 use std::fmt::{self, Display};
-use std::time::Instant;
 use serde::{Serialize, Deserialize};
 
 use types::BlockHash;
@@ -33,10 +32,10 @@ pub struct BlockHead {
 }
 
 pub type MonitorHeadsResult = Result<BlockHead, MonitorHeadsError>;
-pub type StartMonitorHeadsResult<'a> = Result<BoxStream<'a, MonitorHeadsResult>, MonitorHeadsError>;
+pub type StartMonitorHeadsResult = Result<BoxStream<'static, MonitorHeadsResult>, MonitorHeadsError>;
 
 pub trait MonitorHeadsAsync {
-    fn monitor_heads<'a>(&'a self) -> BoxFuture<'a, StartMonitorHeadsResult<'a>>;
+    fn monitor_heads(&self) -> BoxFuture<'static, StartMonitorHeadsResult>;
 }
 
 pub(crate) fn monitor_heads_url(base_url: &str, chain_name: &str) -> String {

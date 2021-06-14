@@ -90,10 +90,10 @@ pub trait RunOperationAsync {
     ///
     /// Useful for calculating fees as is returns estimated consumed gas,
     /// and it doesn't require signing the operation first.
-    fn run_operation<'a>(
-        &'a self,
-        operation_group: &'a NewOperationGroup,
-    ) -> BoxFuture<'a, RunOperationResult>;
+    fn run_operation(
+        &self,
+        operation_group: &NewOperationGroup,
+    ) -> BoxFuture<'static, RunOperationResult>;
 }
 
 pub(crate) fn run_operation_url(base_url: &str) -> String {

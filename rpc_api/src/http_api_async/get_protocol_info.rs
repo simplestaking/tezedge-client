@@ -39,9 +39,10 @@ impl Into<ProtocolInfo> for ProtocolInfoJson {
 }
 
 impl GetProtocolInfoAsync for HttpApi {
-    fn get_protocol_info<'a>(&'a self) -> BoxFuture<'a, GetProtocolInfoResult> {
+    fn get_protocol_info(&self) -> BoxFuture<'static, GetProtocolInfoResult> {
+        let req = self.client.get(&get_protocol_info_url(&self.base_url));
         Box::pin(async move {
-            Ok(self.client.get(&get_protocol_info_url(&self.base_url))
+            Ok(req
                .send().await?
                .json::<ProtocolInfoJson>().await?
                .into())

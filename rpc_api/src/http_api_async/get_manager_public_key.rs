@@ -7,7 +7,6 @@ use crate::api::{
 };
 use crate::http_api_async::HttpApi;
 
-
 impl From<reqwest::Error> for GetManagerPublicKeyErrorKind {
     fn from(error: reqwest::Error) -> Self {
         if let Some(status) = error.status() {
@@ -23,19 +22,21 @@ impl From<reqwest::Error> for GetManagerPublicKeyErrorKind {
 }
 
 impl GetManagerPublicKeyAsync for HttpApi {
-    fn get_manager_public_key<'a>(
-        &'a self,
-        addr: &'a Address,
-    ) -> BoxFuture<'a, GetManagerPublicKeyResult> {
+    fn get_manager_public_key(
+        &self,
+        addr: &Address,
+    ) -> BoxFuture<'static, GetManagerPublicKeyResult> {
+        let req = self.client.get(&get_manager_key_url(&self.base_url, addr));
+        let addr = addr.clone();
         Box::pin(async move {
-            Ok(self.client.get(&get_manager_key_url(&self.base_url, addr))
+            Ok(req
                 .send().await
-                .map_err(|err| GetManagerPublicKeyError::new(addr, err))?
+                .map_err(|err| GetManagerPublicKeyError::new(&addr, err))?
                 .json::<Option<String>>().await
-                .map_err(|err| GetManagerPublicKeyError::new(addr, err))?
+                .map_err(|err| GetManagerPublicKeyError::new(&addr, err))?
                 .map(|key| PublicKey::from_base58check(&key))
                 .transpose()
-                .map_err(|err| GetManagerPublicKeyError::new(addr, err))?)
+                .map_err(|err| GetManagerPublicKeyError::new(&addr, err))?)
         })
     }
 }

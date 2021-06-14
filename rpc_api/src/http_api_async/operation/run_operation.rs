@@ -22,15 +22,18 @@ impl From<reqwest::Error> for RunOperationError {
 }
 
 impl RunOperationAsync for HttpApi {
-    fn run_operation<'a>(
-        &'a self,
-        operation_group: &'a NewOperationGroup,
-    ) -> BoxFuture<'a, RunOperationResult>
+    fn run_operation(
+        &self,
+        operation_group: &NewOperationGroup,
+    ) -> BoxFuture<'static, RunOperationResult>
     {
+        let get_chain_id_fut = self.get_chain_id();
+        let req = self.client.post(&run_operation_url(&self.base_url));
+        let operation_group = operation_group.clone();
         Box::pin(async move {
-            Ok(self.client.post(&run_operation_url(&self.base_url))
+            Ok(req
                 .json(&serde_json::json!({
-                    "chain_id": self.get_chain_id().await?,
+                    "chain_id": get_chain_id_fut.await?,
                     "operation": {
                         "branch": &operation_group.branch,
                         // this is necessary to be valid signature for this call

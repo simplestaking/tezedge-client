@@ -49,10 +49,10 @@ pub trait GetContractDelegate {
 
 pub trait GetContractDelegateAsync {
     /// Get active delegate for a contract.
-    fn get_contract_delegate<'a>(
-        &'a self,
-        address: &'a Address,
-    ) -> BoxFuture<'a, GetContractDelegateResult>;
+    fn get_contract_delegate(
+        &self,
+        address: &Address,
+    ) -> BoxFuture<'static, GetContractDelegateResult>;
 }
 
 pub(crate) fn get_contract_delegate_url(base_url: &str, addr: &Address) -> String {

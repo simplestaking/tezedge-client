@@ -21,9 +21,10 @@ impl From<reqwest::Error> for GetVersionInfoError {
 }
 
 impl GetVersionInfoAsync for HttpApi {
-    fn get_version_info<'a>(&'a self) -> BoxFuture<'a, GetVersionInfoResult> {
+    fn get_version_info(&self) -> BoxFuture<'static, GetVersionInfoResult> {
+        let req = self.client.get(&get_version_info_url(&self.base_url));
         Box::pin(async move {
-            Ok(self.client.get(&get_version_info_url(&self.base_url))
+            Ok(req
                .send().await?
                .json().await?)
         })

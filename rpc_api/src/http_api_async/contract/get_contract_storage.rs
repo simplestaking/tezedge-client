@@ -22,17 +22,19 @@ impl From<reqwest::Error> for GetContractStorageErrorKind {
 }
 
 impl GetContractStorageAsync for HttpApi {
-    fn get_contract_storage<'a>(
-        &'a self,
-        addr: &'a OriginatedAddress,
-    ) -> BoxFuture<'a, GetContractStorageResult>
+    fn get_contract_storage(
+        &self,
+        addr: &OriginatedAddress,
+    ) -> BoxFuture<'static, GetContractStorageResult>
     {
+        let req = self.client.get(&get_contract_storage_url(&self.base_url, addr));
+        let addr = addr.clone();
         Box::pin(async move {
-            self.client.get(&get_contract_storage_url(&self.base_url, addr))
+            req
                 .send().await
-                .map_err(|err| GetContractStorageError::new(addr, err))?
+                .map_err(|err| GetContractStorageError::new(&addr, err))?
                 .json().await
-                .map_err(|err| GetContractStorageError::new(addr, err))
+                .map_err(|err| GetContractStorageError::new(&addr, err))
         })
     }
 }

@@ -23,16 +23,17 @@ impl From<reqwest::Error> for InjectOperationsError {
 }
 
 impl InjectOperationsAsync for HttpApi {
-    fn inject_operations<'a>(
-        &'a self,
-        operation_with_signature: &'a str,
-    ) -> BoxFuture<'a, InjectOperationsResult>
+    fn inject_operations(
+        &self,
+        operation_with_signature: &str,
+    ) -> BoxFuture<'static, InjectOperationsResult>
     {
-        Box::pin(async move {
-            let operation_with_signature_json =
-                SerdeValue::String(operation_with_signature.to_owned());
+        let req = self.client.post(&inject_operations_url(&self.base_url));
+        let operation_with_signature_json =
+            SerdeValue::String(operation_with_signature.to_owned());
 
-            Ok(self.client.post(&inject_operations_url(&self.base_url))
+        Box::pin(async move {
+            Ok(req
                .json(&operation_with_signature_json)
                .send().await?
                .json().await?)

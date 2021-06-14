@@ -37,17 +37,19 @@ impl Into<u64> for ContractCounter {
 }
 
 impl GetContractCounterAsync for HttpApi {
-    fn get_contract_counter<'a>(
-        &'a self,
-        addr: &'a ImplicitAddress,
-    ) -> BoxFuture<'a, GetContractCounterResult>
+    fn get_contract_counter(
+        &self,
+        addr: &ImplicitAddress,
+    ) -> BoxFuture<'static, GetContractCounterResult>
     {
+        let req = self.client.get(&get_contract_counter_url(&self.base_url, addr));
+        let addr = addr.clone();
         Box::pin(async move {
-            Ok(self.client.get(&get_contract_counter_url(&self.base_url, addr))
+            Ok(req
                 .send().await
-                .map_err(|err| GetContractCounterError::new(addr, err))?
+                .map_err(|err| GetContractCounterError::new(&addr, err))?
                 .json::<ContractCounter>().await
-                .map_err(|err| GetContractCounterError::new(addr, err))?
+                .map_err(|err| GetContractCounterError::new(&addr, err))?
                 .into())
         })
     }

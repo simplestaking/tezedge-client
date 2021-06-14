@@ -69,10 +69,10 @@ pub trait GetContractManagerAddressAsync {
     /// - If given address is `ImplicitAddress`, manager address = contract address.
     /// - If given address is `OriginatedAddress`, manager address will
     /// be the one, that originated this contract.
-    fn get_contract_manager_address<'a>(
-        &'a self,
-        addr: &'a Address,
-    ) -> BoxFuture<'a, GetContractManagerAddressResult>;
+    fn get_contract_manager_address(
+        &self,
+        addr: &Address,
+    ) -> BoxFuture<'static, GetContractManagerAddressResult>;
 }
 
 #[inline]
@@ -113,23 +113,28 @@ impl<T> GetContractManagerAddress for T
 }
 
 impl<T> GetContractManagerAddressAsync for T
-    where T: GetContractStorageAsync,
+    where T: GetContractStorageAsync + Send,
 {
-    fn get_contract_manager_address<'a>(
-        &'a self,
-        addr: &'a Address,
-    ) -> BoxFuture<'a, GetContractManagerAddressResult>
+    fn get_contract_manager_address(
+        &self,
+        addr: &Address,
+    ) -> BoxFuture<'static, GetContractManagerAddressResult>
     {
-        Box::pin(async move {
-            match addr {
-                Address::Implicit(addr) => Ok(addr.clone()),
-                Address::Originated(addr) => {
-                    Ok(get_address_from_contract_storage(
-                        addr,
-                        self.get_contract_storage(addr).await?,
-                    )?)
-                }
+        use std::future::ready;
+
+        let addr = addr.clone();
+
+        match addr {
+            Address::Implicit(addr) => Box::pin(ready(Ok(addr))),
+            Address::Originated(addr) => {
+                let contract_storage_fut = self.get_contract_storage(&addr);
+                Box::pin(async move {
+                    get_address_from_contract_storage(
+                        &addr,
+                        contract_storage_fut.await?,
+                    )
+                })
             }
-        })
+        }
     }
 }

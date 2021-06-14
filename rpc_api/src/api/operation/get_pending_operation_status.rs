@@ -60,10 +60,10 @@ pub trait GetPendingOperationStatus {
 }
 
 pub trait GetPendingOperationStatusAsync {
-    fn get_pending_operation_status<'a>(
-        &'a self,
-        operation_hash: &'a str,
-    ) -> BoxFuture<'a, GetPendingOperationStatusResult>;
+    fn get_pending_operation_status(
+        &self,
+        operation_hash: &str,
+    ) -> BoxFuture<'static, GetPendingOperationStatusResult>;
 }
 
 #[inline]
@@ -115,18 +115,20 @@ impl<T> GetPendingOperationStatus for T
 }
 
 impl<T> GetPendingOperationStatusAsync for T
-    where T: GetPendingOperationsAsync,
+    where T: GetPendingOperationsAsync + Clone + Send,
 {
-    fn get_pending_operation_status<'a>(
-        &'a self,
-        operation_hash: &'a str,
-    ) -> BoxFuture<'a, GetPendingOperationStatusResult>
+    fn get_pending_operation_status(
+        &self,
+        operation_hash: &str,
+    ) -> BoxFuture<'static, GetPendingOperationStatusResult>
     {
+        let pending_operations_fut = self.get_pending_operations();
+        let operation_hash = operation_hash.to_owned();
         Box::pin(async move {
-            let pending_operations = self.get_pending_operations().await
-                .map_err(|err| build_error(operation_hash, err))?;
+            let pending_operations = pending_operations_fut.await
+                .map_err(|err| build_error(&operation_hash, err))?;
 
-            get_status_from_pending_operations(operation_hash, pending_operations)
+            get_status_from_pending_operations(&operation_hash, pending_operations)
         })
     }
 }

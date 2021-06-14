@@ -31,4 +31,4 @@ pub use monitor_heads::*;
 
 #[derive(thiserror::Error, Debug)]
 #[error(transparent)]
-pub struct TransportError(pub Box<dyn std::error::Error>);
+pub struct TransportError(pub Box<dyn std::error::Error + Send>);

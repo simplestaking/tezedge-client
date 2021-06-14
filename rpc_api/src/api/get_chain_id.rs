@@ -26,7 +26,7 @@ pub trait GetChainID {
 }
 
 pub trait GetChainIDAsync {
-    fn get_chain_id<'a>(&'a self) -> BoxFuture<'a, GetChainIDResult>;
+    fn get_chain_id(&self) -> BoxFuture<'static, GetChainIDResult>;
 }
 
 pub(crate) fn get_chain_id_url(base_url: &str) -> String {

@@ -40,7 +40,7 @@ pub trait GetPendingOperations {
 
 pub trait GetPendingOperationsAsync {
     /// Get pending operations from mempool.
-    fn get_pending_operations<'a>(&'a self) -> BoxFuture<'a, GetPendingOperationsResult>;
+    fn get_pending_operations(&self) -> BoxFuture<'static, GetPendingOperationsResult>;
 }
 
 pub(crate) fn get_pending_operations_url(base_url: &str) -> String {

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 mod contract;
 pub use contract::*;
 
@@ -22,15 +24,16 @@ pub use get_manager_public_key::*;
 mod monitor_heads;
 pub use monitor_heads::*;
 
+#[derive(Clone)]
 pub struct HttpApi {
-    base_url: String,
+    base_url: Arc<String>,
     client: reqwest::Client,
 }
 
 impl HttpApi {
     pub fn new<S: AsRef<str>>(base_url: S) -> Self {
         Self {
-            base_url: base_url.as_ref().to_owned(),
+            base_url: base_url.as_ref().to_owned().into(),
             client: reqwest::Client::new(),
         }
     }

@@ -22,14 +22,16 @@ impl From<reqwest::Error> for GetContractDelegateErrorKind {
 }
 
 impl GetContractDelegateAsync for HttpApi {
-    fn get_contract_delegate<'a>(
-        &'a self,
-        addr: &'a Address,
-    ) -> BoxFuture<'a, GetContractDelegateResult>
+    fn get_contract_delegate(
+        &self,
+        addr: &Address,
+    ) -> BoxFuture<'static, GetContractDelegateResult>
     {
+        let req = self.client.get(&get_contract_delegate_url(&self.base_url, addr));
+        let addr = addr.clone();
+
         Box::pin(async move {
-            let url = get_contract_delegate_url(&self.base_url, addr);
-            let result = self.client.get(&url).send().await;
+            let result = req.send().await;
 
             let status = match &result {
                 Ok(resp) => Some(resp.status()),
@@ -40,9 +42,9 @@ impl GetContractDelegateAsync for HttpApi {
                 Ok(None)
             } else {
                 result
-                    .map_err(|err| GetContractDelegateError::new(addr, err))?
+                    .map_err(|err| GetContractDelegateError::new(&addr, err))?
                     .json().await
-                    .map_err(|err| GetContractDelegateError::new(addr, err))
+                    .map_err(|err| GetContractDelegateError::new(&addr, err))
             }
         })
     }

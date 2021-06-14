@@ -29,10 +29,10 @@ pub trait InjectOperations {
 }
 
 pub trait InjectOperationsAsync {
-    fn inject_operations<'a>(
-        &'a self,
-        operation_with_signature: &'a str,
-    ) -> BoxFuture<'a, InjectOperationsResult>;
+    fn inject_operations(
+        &self,
+        operation_with_signature: &str,
+    ) -> BoxFuture<'static, InjectOperationsResult>;
 }
 
 pub(crate) fn inject_operations_url(base_url: &str) -> String {

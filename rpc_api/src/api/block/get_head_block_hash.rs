@@ -31,7 +31,7 @@ pub trait GetHeadBlockHash {
 
 pub trait GetHeadBlockHashAsync {
     /// Get head block's hash.
-    fn get_head_block_hash<'a>(&'a self) -> BoxFuture<'a, GetHeadBlockHashResult>;
+    fn get_head_block_hash(&self) -> BoxFuture<'static, GetHeadBlockHashResult>;
 }
 
 pub(crate) fn get_head_block_hash_url(base_url: &str) -> String {

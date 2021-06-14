@@ -17,5 +17,5 @@ pub trait GetConstants {
 }
 
 pub trait GetConstantsAsync {
-    fn get_constants<'a>(&'a self) -> BoxFuture<'a, GetConstantsResult>;
+    fn get_constants(&self) -> BoxFuture<'static, GetConstantsResult>;
 }

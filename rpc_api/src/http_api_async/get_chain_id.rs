@@ -21,9 +21,10 @@ impl From<reqwest::Error> for GetChainIDError {
 }
 
 impl GetChainIDAsync for HttpApi {
-    fn get_chain_id<'a>(&'a self) -> BoxFuture<'a, GetChainIDResult> {
+    fn get_chain_id(&self) -> BoxFuture<'static, GetChainIDResult> {
+        let req = self.client.get(&get_chain_id_url(&self.base_url));
         Box::pin(async move {
-            Ok(self.client.get(&get_chain_id_url(&self.base_url))
+            Ok(req
                .send().await?
                .json().await?)
         })

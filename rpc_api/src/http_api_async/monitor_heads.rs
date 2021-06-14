@@ -23,9 +23,10 @@ impl From<reqwest::Error> for MonitorHeadsError {
 }
 
 impl MonitorHeadsAsync for HttpApi {
-    fn monitor_heads<'a>(&'a self) -> BoxFuture<'a, StartMonitorHeadsResult<'a>> {
+    fn monitor_heads(&self) -> BoxFuture<'static, StartMonitorHeadsResult> {
+        let req = self.client.get(&monitor_heads_url(&self.base_url, "main"));
         Box::pin(async move {
-            Ok(self.client.get(&monitor_heads_url(&self.base_url, "main"))
+            Ok(req
                 .send().await?
                 .bytes_stream()
                 .map(|result| {

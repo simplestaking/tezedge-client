@@ -137,7 +137,7 @@ pub trait BlockGetOperations {
 
 pub trait BlockGetOperationsAsync {
     /// Get head block's hash.
-    fn block_get_operations<'a>(&'a self, block: &'a BlockHash) -> BoxFuture<'a, BlockGetOperationsResult>;
+    fn block_get_operations(&self, block: &BlockHash) -> BoxFuture<'static, BlockGetOperationsResult>;
 }
 
 pub(crate) fn block_get_operations_url(base_url: &str, block_hash: &str) -> String {

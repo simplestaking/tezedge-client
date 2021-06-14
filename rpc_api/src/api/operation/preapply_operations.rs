@@ -31,11 +31,11 @@ pub trait PreapplyOperations {
 }
 
 pub trait PreapplyOperationsAsync {
-    fn preapply_operations<'a>(
-        &'a self,
-        operation_group: &'a NewOperationGroup,
-        signature: &'a str,
-    ) -> BoxFuture<'a, PreapplyOperationsResult>;
+    fn preapply_operations(
+        &self,
+        operation_group: &NewOperationGroup,
+        signature: &str,
+    ) -> BoxFuture<'static, PreapplyOperationsResult>;
 }
 
 pub(crate) fn preapply_operations_url(base_url: &str) -> String {

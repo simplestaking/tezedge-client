@@ -29,5 +29,5 @@ pub mod http_api;
 #[cfg(feature = "async")]
 pub mod http_api_async;
 
-pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
+pub type BoxFuture<'a, T> = futures_core::future::BoxFuture<'a, T>;
 pub type BoxStream<'a, T> = futures_core::stream::BoxStream<'a, T>;

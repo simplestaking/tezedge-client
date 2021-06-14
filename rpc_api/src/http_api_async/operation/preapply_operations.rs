@@ -22,23 +22,25 @@ impl From<reqwest::Error> for PreapplyOperationsError {
 }
 
 impl PreapplyOperationsAsync for HttpApi {
-    fn preapply_operations<'a>(
-        &'a self,
-        operation_group: &'a NewOperationGroup,
-        signature: &'a str,
-    ) -> BoxFuture<'a, PreapplyOperationsResult>
+    fn preapply_operations(
+        &self,
+        operation_group: &NewOperationGroup,
+        signature: &str,
+    ) -> BoxFuture<'static, PreapplyOperationsResult>
     {
+        let req = self.client.post(&preapply_operations_url(&self.base_url));
+        let json = serde_json::json!([{
+            "protocol": &operation_group.next_protocol_hash,
+            "branch": &operation_group.branch,
+            "signature": signature,
+            "contents": operation_group.to_operations_vec()
+                .into_iter()
+                .map(|op| NewOperationWithKind::from(op))
+                .collect::<Vec<_>>(),
+        }]);
         Box::pin(async move {
-            Ok(self.client.post(&preapply_operations_url(&self.base_url))
-                .json(&serde_json::json!([{
-                    "protocol": &operation_group.next_protocol_hash,
-                    "branch": &operation_group.branch,
-                    "signature": signature,
-                    "contents": operation_group.to_operations_vec()
-                        .into_iter()
-                        .map(|op| NewOperationWithKind::from(op))
-                        .collect::<Vec<_>>(),
-                }]))
+            Ok(req
+                .json(&json)
                 .send().await?
                 .json().await?)
         })

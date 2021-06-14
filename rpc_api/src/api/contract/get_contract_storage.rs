@@ -50,10 +50,10 @@ pub trait GetContractStorage {
 }
 
 pub trait GetContractStorageAsync {
-    fn get_contract_storage<'a>(
-        &'a self,
-        addr: &'a OriginatedAddress,
-    ) -> BoxFuture<'a, GetContractStorageResult>;
+    fn get_contract_storage(
+        &self,
+        addr: &OriginatedAddress,
+    ) -> BoxFuture<'static, GetContractStorageResult>;
 }
 
 /// Get manager key
