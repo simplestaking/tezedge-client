@@ -7,26 +7,13 @@ use rpc_api::api::*;
 use explorer_api::TzStats;
 use signer::LocalSigner;
 use types::{Forge, Forged, Network, NewOperationGroup, NewOriginationOperation, NewOriginationScript};
-use types::micheline::Micheline;
 use utils::parse_float_amount;
-use crypto::hex;
 
-fn contract_code_forged() -> Forged {
-    let s = std::fs::read_to_string("./resources/zkchannels_contract_hex").unwrap();
-    Forged::new_unchecked(hex::decode(s).unwrap())
-}
-
-struct InitialStorage {
-}
-
-impl From<InitialStorage> for Micheline {
-    fn from(data: InitialStorage) -> Self {
-        unimplemented!()
-    }
-}
+pub mod zkchannels;
+use zkchannels::{samples, contract_code_forged};
 
 #[tokio::test]
-async fn test_zkchannels_contract() {
+async fn test_zkchannels_contract_sample1() {
     let (_, async_api) = build_http_apis();
     let account = account_1();
 
@@ -36,12 +23,12 @@ async fn test_zkchannels_contract() {
         source: account.address.clone().into(),
         script: NewOriginationScript {
             code: contract_code_forged(),
-            storage: InitialStorage {},
+            storage: samples::sample1::initial_storage().into(),
         },
         balance: parse_float_amount("0.01").unwrap(),
-        fee: parse_float_amount("0.01").unwrap(),
+        fee: parse_float_amount("0.1").unwrap(),
         counter: async_api.get_contract_counter(&account.address).await.unwrap() + 1,
-        gas_limit: 20000,
+        gas_limit: 50000,
         storage_limit: 20000,
     };
 
@@ -54,7 +41,7 @@ async fn test_zkchannels_contract() {
     let signed = signer.sign_forged_operation_bytes(forged.as_ref());
     let op_hash = signed.operation_hash;
 
-    async_api.inject_operations(&signed.operation_with_signature).await.unwrap();
+    dbg!(async_api.inject_operations(&signed.operation_with_signature).await.unwrap());
     assert_eq!(
         async_api.get_pending_operation_status(&op_hash).await.unwrap(),
         PendingOperationStatus::Applied,

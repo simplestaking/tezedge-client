@@ -74,12 +74,12 @@ impl MonitoredOperation {
 }
 
 use std::future::Ready;
-use futures_core::stream::Stream;
+use futures_util::stream::Once;
 
 #[inline]
-fn value_to_stream<T>(value: T) -> impl Stream<Item = T> {
+fn value_to_stream<T>(value: T) -> Once<Ready<T>> {
     futures_util::stream::once(
-        futures_util::future::ready(value)
+        std::future::ready(value)
     )
 }
 
