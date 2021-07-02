@@ -6,5 +6,5 @@ edition = "2018"
 
 [dependencies]
 thiserror = "1.0.24"
-sodiumoxide = "0.2.6"
+sodiumoxide = "=0.2.6"
 base58 = "0.1.0"

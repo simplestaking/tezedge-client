@@ -12,4 +12,4 @@ types = { path = "../types" }
 protobuf = "2.22.0"
 rusb = "0.7.0"
 byteorder = "1.4.2"
-sodiumoxide = "0.2.6"
+sodiumoxide = "=0.2.6"

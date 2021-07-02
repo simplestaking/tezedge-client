@@ -9,4 +9,4 @@ crypto = { path = "../crypto" }
 types = { path = "../types" }
 trezor_api = { path = "../trezor_api" }
 thiserror = "1.0.24"
-sodiumoxide = "0.2.6"
+sodiumoxide = "=0.2.6"

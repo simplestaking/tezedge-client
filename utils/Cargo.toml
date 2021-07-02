@@ -7,4 +7,4 @@ edition = "2018"
 [dependencies]
 serde = { version = "1.0.123", features = ["derive"] }
 rust_decimal = "1.10.3"
-sodiumoxide = "0.2.6"
+sodiumoxide = "=0.2.6"
